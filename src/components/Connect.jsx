@@ -1,15 +1,34 @@
 import React, { useState } from "react";
+import { Contract, ethers } from "../ether-connections/ethers-5.6.esm.min.js";
 
 const Connect = () => {
-  const [state, getState] = useState("Connect your Metamask Wallet");
+  const [state, setState] = useState("Connect your Metamask Wallet");
+  const [provider, setProvider] = useState(null);
+  const [account, setAccount] = useState(undefined);
   const connectMetamask = async () => {
     if (typeof window.ethereum !== "undefined") {
-      console.log("I see a metamask");
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      getState("Connected");
+      // console.log("I see a metamask");
+      // await window.ethereum.request({ method: "eth_requestAccounts" });
+      // setState("Connected");
+
+      const providers = new ethers.providers.Web3Provider(window.ethereum);
+      setProvider(providers);
+      await providers.send("eth_requestAccounts", []);
+      const signer = providers.getSigner();
+      console.log("Signer", signer);
+      const address = await signer.getAddress();
+      console.log(address);
+      // const acc = await signer.getBalance();
+      console.log("Metamask connected: ", providers);
+      // console.log("Providers: ", acc);
+
+      setState("Connected");
+      setAccount(address);
+      console.log(account);
+
       window.alert(" Yeh!!!  connected to the metamask!!!!!!");
     } else {
-      getState("Please Install Metamask");
+      setState("Please Install Metamask");
       console.log("Don't see metamask");
     }
   };

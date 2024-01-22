@@ -5,24 +5,33 @@ import { listenForTransactionMine } from "../ether-connections/listenForTransact
 
 const Withdraw = () => {
   const ethAmountRef = useRef();
+
   const handleWithdraw = async (event) => {
     event.preventDefault();
     const ethAmount = ethAmountRef.current?.value;
     console.log(`Withdrawing amount ${ethAmount}...`);
+    console.log(`Withdrawing amount ${ethers.utils.parseEther(ethAmount)}...`);
     console.log(`Withdrawing...`);
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
+      const address = signer.getAddress();
       const contract = new ethers.Contract(contractAddress, abi, signer);
-      console.log("Contract Details ..", contract);
-      console.log("Contract Details ..", contractAddress);
-      console.log("Contract Details ..", abi);
-      console.log("Contract Details ..", signer);
       try {
-        const transactionResponse = await contract.withdraw({
-          value: ethers.utils.parseEther(ethAmount),
-        });
+        const transactionResponse = await contract.withdraw(
+          ethers.utils.parseEther(ethAmount)
+        );
         await listenForTransactionMine(transactionResponse, provider);
+
+        contract.on("Withdrawn", (address, ethAmount, event) => {
+          let info = {
+            from: address,
+            to: contractAddress,
+            value: ethers.utils.formatEther(ethAmount),
+            data: event,
+          };
+          console.log(JSON.stringify(info, null, 4));
+        });
       } catch (error) {
         console.log(error);
       }

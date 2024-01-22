@@ -2,35 +2,37 @@ import React, { useRef } from "react";
 import { Contract, ethers } from "../ether-connections/ethers-5.6.esm.min.js";
 import { abi, contractAddress } from "../ether-connections/constants.js";
 import { listenForTransactionMine } from "../ether-connections/listenForTransactionMine.js";
-const Deposit = () => {
-  const ethAmountRef = useRef();
 
-  const handleDeposit = async (event) => {
+const Transfer = () => {
+  const ethAmountRef = useRef();
+  const addressRef = useRef();
+  const handleTransfer = async (event) => {
     event.preventDefault();
     const ethAmount = ethAmountRef.current?.value;
-    console.log(`Funding with ${ethAmount}...`);
+    const toAddress = addressRef.current?.value;
+    console.log(`Transaction with ${ethAmount}...and address ${toAddress}`);
+
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      //console.log(signer);
       const address = signer.getAddress();
-      //console.log(address);
       const contract = new ethers.Contract(contractAddress, abi, signer);
-      //console.log(contract);
       try {
-        const transactionResponse = await contract.fund({
-          value: ethers.utils.parseEther(ethAmount),
-        });
-        await listenForTransactionMine(transactionResponse, provider);
-        contract.on("Funded", (address, ethAmount, event) => {
+        const transactionResponse = await contract.transferEther(
+          toAddress,
+          ethers.utils.parseEther(ethAmount)
+        );
+        contract.on("Transferred", (address, toAddress, ethAmount, event) => {
           let info = {
             from: address,
-            to: contractAddress,
+            to: toAddress,
             value: ethers.utils.formatEther(ethAmount),
+            gasLimit: 250000,
             data: event,
           };
           console.log(JSON.stringify(info, null, 4));
         });
+        await listenForTransactionMine(transactionResponse, provider);
       } catch (error) {
         console.log(error);
       }
@@ -41,7 +43,8 @@ const Deposit = () => {
   };
   return (
     <div className="py-10">
-      <form onSubmit={handleDeposit}>
+      <h2> Tranfer Ether</h2>
+      <form onSubmit={handleTransfer}>
         <input
           id="eth-amount"
           placeholder="eth-amount"
@@ -49,15 +52,22 @@ const Deposit = () => {
           ref={ethAmountRef}
           className="w-96 p-5 rounded-full border-solid border-2 border-indigo-600"
         />
+        <input
+          id="address"
+          placeholder="address"
+          type="text"
+          ref={addressRef}
+          className="w-96 mt-2 p-5 rounded-full border-solid border-2 border-indigo-600"
+        />
         <button
           type="submit"
           className=" btn rouded-full bg-fuchsia-600 text-white text-1xl mx-4"
         >
-          Deposit
+          Transfer Ether
         </button>
       </form>
     </div>
   );
 };
 
-export default Deposit;
+export default Transfer;
