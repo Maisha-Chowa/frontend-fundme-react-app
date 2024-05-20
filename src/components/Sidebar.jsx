@@ -23,7 +23,13 @@ const Sidebar = () => {
         <ul className="menu p-4 w-60 min-h-full bg-base-200 text-base-content">
           {/* Sidebar content here */}
           <li className="text-lg text-fuchsia-400">
-            <Link to="/">Connect to Wallet</Link>
+            <Link to="/">Home</Link>
+          </li>
+          <li className="text-lg text-fuchsia-400">
+            <Link to="/create-account">Create Account</Link>
+          </li>
+          <li className="text-lg text-fuchsia-400">
+            <Link to="/your-wallet">Wallet</Link>
           </li>
           <li className="text-lg text-fuchsia-400">
             <Link to="/account">Account</Link>
