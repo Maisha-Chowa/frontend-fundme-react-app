@@ -12,7 +12,7 @@ const Deposit = () => {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      //console.log(signer);
+      console.log(signer);
       const address = signer.getAddress();
       //console.log(address);
       const contract = new ethers.Contract(contractAddress, abi, signer);

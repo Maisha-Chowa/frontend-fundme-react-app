@@ -61,7 +61,7 @@ function Home() {
           Welcome to your Web3 Wallet
         </h4>
         <Button
-          onClick={() => navigate("/your-wallet")}
+          onClick={() => navigate("/create-account")}
           className="frontPageButton w-25 bg-fuchsia-500 text-white mr-4"
           //   type="primary"
         >

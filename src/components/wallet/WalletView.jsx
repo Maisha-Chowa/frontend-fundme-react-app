@@ -138,51 +138,56 @@ function WalletView() {
         </>
       ),
     },
-    // {
-    //   key: "1",
-    //   label: `Transfer`,
-    //   children: (
-    //     <>
-    //       <h3>Native Balance </h3>
-    //       <h1>
-    //         {balance.toFixed(2)} {CHAINS_CONFIG[selectedChain].ticker}
-    //       </h1>
-    //       <div className="sendRow">
-    //         <p style={{ width: "90px", textAlign: "left" }}> To:</p>
-    //         <Input
-    //           value={sendToAddress}
-    //           onChange={(e) => setSendToAddress(e.target.value)}
-    //           placeholder="0x..."
-    //         />
-    //       </div>
-    //       <div className="sendRow">
-    //         <p style={{ width: "90px", textAlign: "left" }}> Amount:</p>
-    //         <Input
-    //           value={amountToSend}
-    //           onChange={(e) => setAmountToSend(e.target.value)}
-    //           placeholder="Native tokens you wish to send..."
-    //         />
-    //       </div>
-    //       <Button
-    //         style={{ width: "100%", marginTop: "20px", marginBottom: "20px" }}
-    //         type="primary"
-    //         onClick={() => sendTransaction(sendToAddress, amountToSend)}
-    //       >
-    //         Send Tokens
-    //       </Button>
-    //       {processing && (
-    //         <>
-    //           <Spin />
-    //           {hash && (
-    //             <Tooltip title={hash}>
-    //               <p>Hover For Tx Hash</p>
-    //             </Tooltip>
-    //           )}
-    //         </>
-    //       )}
-    //     </>
-    //   ),
-    // },
+    {
+      key: "1",
+      label: `Transfer`,
+      children: (
+        <>
+          <h3 className="text-xl text-fuchsia-400 pb-4 text-center ">
+            Native Balance{" "}
+          </h3>
+          <h1 className="text-xl text-fuchsia-400 pb-4 text-center">
+            {balance.toFixed(4)} {CHAINS_CONFIG[selectedChain].ticker}
+          </h1>
+          <div className="sendRow">
+            <p className="text-lg text-fuchsia-400 pb-4 text-left "> To:</p>
+            <Input
+              value={sendToAddress}
+              onChange={(e) => setSendToAddress(e.target.value)}
+              placeholder="0x..."
+            />
+          </div>
+          <div className="sendRow">
+            <p className="text-lg text-fuchsia-400 pb-4 text-left py-2 ">
+              {" "}
+              Amount:
+            </p>
+            <Input
+              value={amountToSend}
+              onChange={(e) => setAmountToSend(e.target.value)}
+              placeholder="Native tokens you wish to send..."
+            />
+          </div>
+          <Button
+            className="my-4 text-white bg-fuchsia-800 w-96"
+            type="primary"
+            onClick={() => sendTransaction(sendToAddress, amountToSend)}
+          >
+            Send Tokens
+          </Button>
+          {processing && (
+            <>
+              <Spin />
+              {hash && (
+                <Tooltip title={hash}>
+                  <p>Hover For Tx Hash</p>
+                </Tooltip>
+              )}
+            </>
+          )}
+        </>
+      ),
+    },
   ];
 
   async function sendTransaction(to, amount) {
@@ -199,12 +204,17 @@ function WalletView() {
       value: ethers.parseEther(amount.toString()),
     };
 
+    console.log(
+      ` chain : ${chain} \n provider : ${provider} \n privateKey: ${privateKey} \n wallet: ${wallet} \n tx: ${tx}`
+    );
     setProcessing(true);
     try {
       const transaction = await wallet.sendTransaction(tx);
 
       setHash(transaction.hash);
       const receipt = await transaction.wait();
+
+      console.log(`transaction : ${transaction} \n receipt: ${receipt}`);
 
       setHash(null);
       setProcessing(false);
@@ -249,37 +259,12 @@ function WalletView() {
 
     setFetching(false);
   }
-
-  // const items = [
-  //   {
-  //     key: "3",
-  //     label: `Tokens`,
-  //     // children: {
-
-  //     // },
-  //   },
-  //   {
-  //     key: "2",
-  //     label: `NFTs`,
-  //     // children: {
-  //     //   NFTs,
-  //     // },
-  //   },
-  //   {
-  //     key: "3",
-  //     label: `Transfer`,
-  //     // children: {
-  //     //   Transfer,
-  //     // },
-  //   },
-  // ];
-
   function logout() {
     setSeedPhrase(null);
     setWallet(null);
-    // setNfts(null);
-    // setTokens(null);
-    // setBalance(0);
+    setNfts(null);
+    setTokens(null);
+    setBalance(0);
     navigate("/");
   }
 
@@ -314,12 +299,12 @@ function WalletView() {
           </div>
         </Tooltip>
         <Divider />
-        <Tabs defaultActiveKey="1" items={items} className="walletView" />
-        {/* {fetching ? (
+
+        {fetching ? (
           <Spin />
         ) : (
           <Tabs defaultActiveKey="1" items={items} className="walletView" />
-        )} */}
+        )}
       </div>
     </>
   );
